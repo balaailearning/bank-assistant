@@ -1,6 +1,7 @@
 from langchain.tools import tool
+from models import Expense
 import pandas as pd
-
+from datetime import date
 EXCEL_FILE="bank_data.xlsx"
 
 @tool
@@ -80,3 +81,41 @@ def total_transactions() -> str:
     df = pd.read_excel(EXCEL_FILE, sheet_name="Expenses")
 
     return f"You have {len(df)} expense transactions."
+
+@tool
+def add_expense(expense:Expense) -> str:
+    """
+    add the expense passed from user into the excel sheet
+    """
+
+    df = pd.read_excel(EXCEL_FILE,sheet_name="Expenses")
+    new_row = pd.DataFrame(
+        [
+            {
+                "Date": date.today(),
+                "Category": expense.category,
+                "Description": expense.description,
+                "Amount": expense.amount,
+            }
+        ]
+    )
+    df = pd.concat(
+        [df,new_row],
+        ignore_index=True,
+    )
+    with pd.ExcelWriter(
+        "bank_data.xlsx",
+        engine="openpyxl",
+        mode="a",
+        if_sheet_exists="replace"
+    ) as writer:
+        df.to_excel(
+            writer,
+            sheet_name="Expenses",
+            index=False
+        )
+
+    return (
+        f"Added {expense.category} expense "
+        f"of ₹{expense.amount}"
+    )
