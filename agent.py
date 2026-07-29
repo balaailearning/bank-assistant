@@ -1,5 +1,6 @@
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
+from datetime import date
 import os
 from dotenv import load_dotenv
 from tools import (
@@ -8,6 +9,7 @@ from tools import (
     get_balance,
     expense_by_category,
     largest_expense,
+    add_expense,
 )
 load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
@@ -27,6 +29,7 @@ tools = [
     get_balance,
     expense_by_category,
     largest_expense,
+    add_expense,
 ]
 
 system_prompt = """
